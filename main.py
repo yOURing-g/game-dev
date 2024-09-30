@@ -6,6 +6,10 @@ def init_game():
     pygame.mixer.init() #sound system
     screen = pygame.display.set_mode((settings.WIDTH,settings.HEIGHT)) #sets window width and height
     pygame.display.set_caption(settings.TITLE)
+    # load icon
+
+    icon2 = pygame.image.load("coffe_3.png")
+    pygame.display.set_icon(icon2)
     clock = pygame.time.Clock()
     all_sprites = pygame.sprite.Group()
     running = True  # if game is running
@@ -36,12 +40,14 @@ def run_game(screen,clock,all_sprites,playing,running):
 
 
 def draw_sprites(screen , all_sprites):
-    screen.fill(settings.WHITE)
+    screen.fill(settings.BLACK)
     all_sprites.draw(screen)
     pygame.display.flip()
 
 def update_game(all_sprites):
+
     all_sprites.update()
+
 
 def start_game():
     screen, clock, all_sprites, playing, running = init_game()
