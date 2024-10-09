@@ -1,59 +1,98 @@
-import pygame
-import settings
+import pygame as pg
+import sys
+from settings import *
+from player import *
+
+from obstacles import *
 
 def init_game():
-    pygame.init()
-    pygame.mixer.init() #sound system
-    screen = pygame.display.set_mode((settings.WIDTH,settings.HEIGHT)) #sets window width and height
-    pygame.display.set_caption(settings.TITLE)
-    # load icon
-
-    icon2 = pygame.image.load("coffe_3.png")
-    pygame.display.set_icon(icon2)
-    clock = pygame.time.Clock()
-    all_sprites = pygame.sprite.Group()
-    running = True  # if game is running
-    playing =True
-
-    return screen, clock , all_sprites,playing,running
-# create new instance of the game
-def new_game(screen,clock,all_sprites,running):
-     all_sprites = pygame.sprite.Group()
-     playing = True
-     return run_game(screen,clock,all_sprites,playing,running)
-
-def handle_event(playing,running):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            playing =False
-            running = False
-    return  playing, running
+    pg.init()
+    game = {
+        'screen': pg.display.set_mode((WIDTH, HEIGHT)),
+        'clock': pg.time.Clock(),
+        'all_sprites': [],
+        'walls': [],
+        'player': None,
+        'running': True,
+        'playing': False
+    }
+    pg.display.set_caption(TITLE)
+    return game
 
 
-def run_game(screen,clock,all_sprites,playing,running):
-    while playing:
-        clock.tick(settings.FPS)
-        playing,running = handle_event(playing,running)
-        update_game(all_sprites)
-        draw_sprites(screen,all_sprites)
-    return  playing , running
+def new_instance(game):
+    # Reset all sprites
+    game['all_sprites'] = []
+    game['walls'] = []
+
+    # Create player and walls
+    init_player(game, 0, 0)
+    draw_wall(game,5,0)
 
 
-def draw_sprites(screen , all_sprites):
-    screen.fill(settings.BLACK)
-    all_sprites.draw(screen)
-    pygame.display.flip()
 
-def update_game(all_sprites):
-
-    all_sprites.update()
-
-
-def start_game():
-    screen, clock, all_sprites, playing, running = init_game()
-    while running:
-        playing, running = new_game(screen,clock,all_sprites,running)
-    pygame.quit()
+def run_game(game):
+    game['playing'] = True
+    while game['playing']:
+        dt = game['clock'].tick(FPS) / 1000
+        handle_events(game)
+        update_game(game)
+        draw_game(game)
 
 
-start_game()
+def handle_events(game):
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            quit_game(game)
+
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_LEFT:
+                move_player(game["player"], x=-1)
+            if event.key == pg.K_RIGHT:
+                move_player(game["player"], x=1)
+            if event.key == pg.K_UP:
+                move_player(game["player"], y=-1)
+            if event.key == pg.K_DOWN:
+               move_player(game["player"], y=1)
+
+
+
+def update_game(game):
+    # Update player and walls
+    player = game["player"]
+    update_player(game["player"])
+    # for wall in game['walls']:
+    #     update_wall(wall)
+    # pass
+
+
+
+def draw_grid(game):
+    for x in range(0,WIDTH,TILESIZE):
+        pg.draw.line(game["screen"],BLACK,(x,0),(x,HEIGHT))
+    for  y in range(0,WIDTH,TILESIZE):
+        pg.draw.line(game["screen"],BLACK,(0,y),(WIDTH,y))
+
+
+
+def draw_game(game):
+    # Clear screen and draw everything
+    game['screen'].fill(TAN)
+    draw_grid(game)
+    for sprite in game['all_sprites']:
+        game['screen'].blit(sprite['image'], sprite['rect'])
+
+    # Update display
+    pg.display.flip()
+
+
+def quit_game(game):
+    pg.quit()
+    sys.exit()
+
+
+if __name__ == "__main__":
+    game = init_game()
+    while game['running']:
+        new_instance(game)
+        run_game(game)
