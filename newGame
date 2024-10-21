@@ -1,46 +1,55 @@
 import pygame
 
-
 import spritesheet
 
-
 pygame.init()
-WIDTH = 1280
-HEIGHT = 720
-screen = pygame.display.set_mode((WIDTH,HEIGHT))
+WIDTH = 1280*2
+HEIGHT = 720*2
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("sprite show")
 
 # activate sprite sheet
 sprite_image = pygame.image.load("running_anim_1.png").convert_alpha()
+# CLASS INIT
 sheet = spritesheet.SpriteSheet(sprite_image)
-BLACK = (0,0,0)
-WIHITE = (255,255,255)
-pygame.key.set_repeat(500,100)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+#
+pygame.key.set_repeat(500, 100)
+# extract frames
 frames = [
-sheet.get_image(0, 86,84),
-sheet.get_image(1, 86,84),
-sheet.get_image(2, 86,84),
-sheet.get_image(3, 86,84)
-
+    sheet.get_image(0, 86, 84),
+    sheet.get_image(1, 86, 84),
+    sheet.get_image(2, 86, 84),
+    sheet.get_image(3, 86, 84)
 
 ]
 
 current_frame = 0
 start = True
-
-
+x_pos = 0
+y_pos = 0
+movement_speed=10
 while start:
     screen.fill(BLACK)
-    screen.blit(frames[current_frame],(150,150))
+
+    screen.blit(frames[current_frame], (x_pos, y_pos))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             start = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                current_frame = (current_frame +1 ) % len(frames)
-
-  
-
+                current_frame = (current_frame + 1) % len(frames)
+                x_pos += movement_speed
+            elif event.key == pygame.K_LEFT:
+                current_frame = (current_frame + 1) % len(frames)
+                x_pos -= movement_speed
+            elif event.key == pygame.K_DOWN:
+                current_frame = (current_frame + 1) % len(frames)
+                y_pos += movement_speed
+            elif event.key == pygame.K_UP:
+                current_frame = (current_frame + 1) % len(frames)
+                y_pos -= movement_speed
     pygame.display.update()
 pygame.quit()
