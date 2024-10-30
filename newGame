@@ -3,13 +3,13 @@ import pygame
 import spritesheet
 
 pygame.init()
-WIDTH = 1280*2
-HEIGHT = 720*2
+WIDTH = 1280
+HEIGHT = 720
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("sprite show")
 
 # activate sprite sheet
-sprite_image = pygame.image.load("running_anim_1.png").convert_alpha()
+sprite_image = pygame.image.load("running_anim_13.png").convert_alpha()
 # CLASS INIT
 sheet = spritesheet.SpriteSheet(sprite_image)
 BLACK = (0, 0, 0)
@@ -17,39 +17,67 @@ WHITE = (255, 255, 255)
 #
 pygame.key.set_repeat(500, 100)
 # extract frames
-frames = [
-    sheet.get_image(0, 86, 84),
-    sheet.get_image(1, 86, 84),
-    sheet.get_image(2, 86, 84),
-    sheet.get_image(3, 86, 84)
+frame_width = 160
+frame_height = 167
+frame_right = [
+    sheet.get_image(0,0, frame_width, frame_height),
+    sheet.get_image(1, 0,frame_width, frame_height),
+    sheet.get_image(2, 0,frame_width, frame_height),
+    sheet.get_image(3, 0,frame_width, frame_height)
 
 ]
+
+left_frame = [
+    sheet.get_image(0, 1, frame_width, frame_height),
+    sheet.get_image(1, 1, frame_width, frame_height),
+    sheet.get_image(2, 1, frame_width, frame_height),
+    sheet.get_image(3, 1, frame_width, frame_height)
+
+]
+
+
+
 
 current_frame = 0
 start = True
 x_pos = 0
 y_pos = 0
 movement_speed=10
+obstacle = pygame.Rect(600,300, 500,200)
+
+current_frames = frame_right
 while start:
     screen.fill(BLACK)
+    pygame.draw.rect(screen,WHITE,obstacle)
 
-    screen.blit(frames[current_frame], (x_pos, y_pos))
+    screen.blit(current_frames[current_frame], (x_pos, y_pos))
+    player_box = pygame.Rect(x_pos,y_pos,frame_width,frame_height)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             start = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
-                current_frame = (current_frame + 1) % len(frames)
+                current_frame = (current_frame + 1) % len(current_frames)
+                if player_box.colliderect(obstacle):
+                    x_pos -=movement_speed
+
+                current_frames = frame_right
+                player_box.x = x_pos
                 x_pos += movement_speed
+
             elif event.key == pygame.K_LEFT:
-                current_frame = (current_frame + 1) % len(frames)
+                current_frames = left_frame
+                current_frame = (current_frame + 1) % len(current_frames)
+                player_box.x = x_pos
                 x_pos -= movement_speed
             elif event.key == pygame.K_DOWN:
-                current_frame = (current_frame + 1) % len(frames)
+                current_frame = (current_frame + 1) % len(current_frames)
+                player_box.y = y_pos
                 y_pos += movement_speed
             elif event.key == pygame.K_UP:
-                current_frame = (current_frame + 1) % len(frames)
+                current_frame = (current_frame + 1) % len(current_frames)
+                player_box.y = y_pos
                 y_pos -= movement_speed
     pygame.display.update()
 pygame.quit()
